@@ -1,3 +1,6 @@
+Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta-kurssin](https://terokarvinen.com/palvelinten-hallinta/) kotitehtävään _h1 Hei Ansiblen maailma_.
+
+
 ### a) Debian 13 -virtuaalikoneen luominen
 
 Tulevien harjoitusten ympäristönä toimii Oraclen VirtualBoxiin asennettu Debian 13.7.0 -käyttöjärjestelmä. Virtuaalikoneen laitteistoresursseiksi asetettiin kaksi prosessoriydintä, 4 Gt keskusmuistia ja 40 Gt levytilaa. Harjoituksissa hyödynnetään localhostia eli paikallista virtuaalikonetta testialustana. 
@@ -38,3 +41,10 @@ Lopullinen varmistus siitä, että luotu tiedosto oli kulkeutunut oikeaan paikka
 <img width="916" height="350" alt="Screenshot 2026-10-28 164755" src="https://github.com/user-attachments/assets/b5311318-6c4f-4773-8448-6eaa180dfd1e" />
 
 
+### Lähteet
+
+Karvinen, Tero 2026. Hello Ansible. Luettavissa: https://terokarvinen.com/hello-ansible/. Luettu: 28.10.2026. 
+
+Karvinen, Tero 2026. Palvelinten hallinta -kurssi. Luettavissa: https://terokarvinen.com/palvelinten-hallinta/. Luettu: 27.10.2026. 
+
+Karvinen, Tero 2026. SSH public key - Login without password. Luettavissa: https://terokarvinen.com/ssh-public-key-login-without-password/. Luettu: 27.10.2026. 
