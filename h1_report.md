@@ -1,5 +1,23 @@
 Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta-kurssin](https://terokarvinen.com/palvelinten-hallinta/) kotitehtävään _h1 Hei Ansiblen maailma_.
 
+### x) 
+#### [Karvinen 2026: SSH public key - Login without password](https://terokarvinen.com/ssh-public-key-login-without-password/)
+- SSH mahdollistaa turvallisen kirjautumisen palvelimille ilman salasanaa
+- toimii usein taustapalveluna
+- perustuu avainpareihin (julkinen ja yksityinen avain)
+- avainparin luominen komennolla `ssh-keygen`
+- julkinen avain kopioidaan palvelimelle komennolla `ssh-copy-id [user@ip-osoite]`
+- kirjautuminen tapahtuu käyttäen `ssh [kohde]`
+
+#### [Karvinen 2026: Hello Ansible](https://terokarvinen.com/hello-ansible/)
+- Ansible mahdollistaa useiden koneiden keskitetyn hallinnan
+- toimii SSH-yhteyden kautta
+- määritykset kirjoitetaan koodina (IaC, Infrastructure as Code)
+- Ansible vaaditaan vain master-koneella, slave-koneilla oltava SSH ja Python
+- hallittavat koneet ja ryhmät lisätään tiedostoon `hosts.ini`
+- koneiden roolien ajamisesta  määritetään nk. _playbookissa_ (esim. `site.yml`).
+- roolien sisältämät toimet määritetään polussa `roles/[name]/tasks/main.yml`
+- Ansiblen omia asetuksia säädetään tiedostolla `ansible.cfg`
 
 ### a) Debian 13 -virtuaalikoneen luominen
 
@@ -28,13 +46,43 @@ Onnistuneesta ssh-kirjautumisesta ilman salasanakyselyä voitiin varmistua komen
 
 ### d) Ansible ja Hello World
 
-Tehtävä aloitettiin asentamalla palvelinten hallintaohjelmisto Ansible virtuaalikoneen ympäristöön `sudo apt-get install ansible`.
+Tehtävä aloitettiin asentamalla palvelinten hallintaohjelmisto Ansible virtuaalikoneen ympäristöön: `sudo apt-get install ansible`.
 
-Tämän jälkeen käyttäjän kotihakemistoon luotiin hakemisto _ansible_, jonka alle tehtiin tarvittavat tiedostot ja hakemistot. Ensimmäinen näistä oli tekstitiedosto `hosts.ini`, joka sisälsi vain yhden rivin tekstiä eli tässä harjoituksessa käytetyn kohdekoneen `localhost`. Lisäksi luotiin konfiguraatiotiedosto ansible.cfg, johon määritettiin oletus-inventoryksi kyseinen hosts.ini. Tiedosto `site.yml` puolestaan määrittää mitä rooleja ajetaan millekin koneille. Tässä tapauksessa kaikille koneille ajettiin hello-rooli. Hakemistoon `roles/hello/tasks/` luotiin `main.yml` tehtiin varsinainen tehtävätiedosto, joka kopioi ja luo tiedoston polkuun `/tmp/hello-ansible` sisällöllä `"Hello World!"`.
+Tämän jälkeen käyttäjän kotihakemistoon luotiin hakemisto _ansible_, jonka alle tehtiin tarvittavat tiedostot ja hakemistot. Ensimmäinen näistä oli tekstitiedosto `hosts.ini`, jossa määritetään hallittavat hostit eli koneet. Tiedostoon kirjoitettiin ensimmäiselle riville harjoituksessa käytetty kohdekone `localhost`. Lisäksi tiedostoon lisättiin [Teron ohjeiden avulla](https://terokarvinen.com/hello-ansible/#convenience-stop-whining-about-python-version) määre, mikä käskee Ansiblea käyttämään kohdekoneen paikallista Python-tulkkia, jotta voitiin välttyä tulkin versioon liittyvältä herjalta. Tiedoston sisältö oli siis:
 
-Luotu automaatio ajettiin komennolla `ansible-playbook site.yml`.
+```
+localhost
 
-Tulosteesta voitiin varmistua, että Ansible suoritti onnistuneesti halutun laisen muutoksen kohdekoneelle hyödyntäen SSH-yhteyttä.
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+```
+
+Lisäksi luotiin konfiguraatiotiedosto `ansible.cfg`, johon määritettiin oletus-inventoryksi kyseinen hosts.ini:
+
+```
+[defaults]
+inventory = hosts.ini
+```
+
+Tämän myötä esimerkiksi komento `ansible all -a 'uptime' -i hosts.ini` lyheni muotoon `ansible all -a 'uptime'`. Ansible käyttää siis oletuksena tätä listaa ellei muuta ole komennossa määritetty.
+
+Ansiblen niin kutsuttu _playbook_-tiedosto, tässä yhteydessä `site.yml`, puolestaan määrittää mitä rooleja ajetaan millekin koneille. Tässä tapauksessa asetettiin kaikille koneille hello-rooli:
+
+```
+- hosts: all
+  roles: 
+    - hello
+```
+
+Varsinaisen roolin toimenpiteet määritettiin hakemistossa `/ansible/roles/hello/tasks/`, jonne tehtiin varsinainen tehtävätiedosto `main.yml`. Tehtäväksi tässä yhteydessä annettiin kopioida ja luoda tiedosto polkuun `/tmp/hello-ansible` sisällöllä _Hello World!_:
+
+```
+- copy:
+    dest: /tmp/hello-ansible
+    content: "Hello World!\n"
+```
+
+Luotu automaatio ajettiin komennolla `ansible-playbook site.yml`. Tulosteesta voitiin varmistua, että Ansible suoritti onnistuneesti halutun muutoksen kohdekoneelle hyödyntäen SSH-yhteyttä, sillä _PLAY RECAP_ -otsakkeen alta oli nähtävissä `changed=1` eli toimenpide oli muuttanut yhtä tiedostoa kohdekoneella. 
 
 Lopullinen varmistus siitä, että luotu tiedosto oli kulkeutunut oikeaan paikkaan ja oikealla sisällöllä saatiin komennolla `ssh localhost 'cat /tmp/hello-ansible'`.
 
