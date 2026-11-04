@@ -1,5 +1,3 @@
-#### Raportti on keskeneräinen ja valmistuu myöhässä lopulliseen muotoonsa viimeistään klo 20:15 mennessä. 
-
 Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta -kurssin](https://terokarvinen.com/palvelinten-hallinta/) kotitehtävään _h2 Voileipä_.
 
 Ympäristönä toimii Oraclen VirtualBoxiin asennettu Debian 13.7.0 -käyttöjärjestelmä. Virtuaalikoneen laitteistoresursseiksi on asetettu kaksi prosessoriydintä, 4 Gt keskusmuistia ja 40 Gt levytilaa. Harjoituksissa hyödynnetään lisäksi UpCloudin virtuaalipalvelinta.
@@ -11,7 +9,38 @@ Ympäristönä toimii Oraclen VirtualBoxiin asennettu Debian 13.7.0 -käyttöjä
 - tiedosto `/etc/sudoers.d/sudoless` sisältää rivin `%sudoless ALL = (ALL) NOPASSWD: ALL`
 - manuaalinen testaus ennen automaatiota
 - oikeuksien määritys yhteensopivin ja turvallisin oktaalimuotoisena (esim. 0644)
-  
+
+#### Ansiblen moduuleja
+- `copy` - kopioi tiedostoja ja polkuja käyttöoikeuksineen toiselta koneelta hallinnoitavalle koneelle
+  - content: Määrittää siirrettävän tiedoston sisällön merkkijonona
+  - dest: Tiedoston polku kohdekoneella
+  - src: Kopioitavan tiedoston polku lähdekoneella
+  - owner: Tiedoston omistava käyttäjä
+  - group: Tiedoston omistava ryhmä
+  - mode: Tiedoston käyttöoikeudet oktaalimuodossa 
+- `apt` - Hallinnoi apt-ohjelmistopaketteja
+  - name: Haluttujen pakettien nimet
+  - state: Paketin tila, esim. `present`, `absent`. Päivitys uusimpaan tilalla `latest` 
+  - update_cache: Päivittää pakettivaraston välimuistin, vastaa komentoa `apt-get update`
+- `file` - Ohjaa tiedostojen ja hakemistojen tietoja ja olemassaoloa
+  - path: Toimenpiteen kohteena olevan tiedoston tai hakemiston polku
+  - recurse: Rekursiivisuus eli koskeeko komento myös alihakemistoja
+  - src: Lähdepolku 
+  - state: Kohteen tila 
+  - owner: Tiedoston tai kansion omistava käyttäjä
+  - group: Tiedoston tai kansion omistava ryhmä
+  - mode: Tiedoston käyttöoikeudet oktaalimuodossa
+- `user` - vastaa käyttäjätilien luomisesta ja ominaisuuksista
+  - name: Käyttäjän nimi 
+  - create_home: Määrittää luodaanko käyttäjälle kotihakemisto 
+  - comment: Kuvaus tai nimi
+  - groups: Ryhmät, joihin käyttäjä liitetään 
+  - shell: Käyttäjän oletuskomentotulkki
+  - state: Määrittää käyttäjätilin olemassaolon (`present`/`absent`)
+  - system: Luodaanko käyttäjä järjestelmäkäyttäjänä
+- `authorized_key` - Hallinnoi käyttäjätilien ssh-avaimia
+  - user: Käyttäjä, jonka avaintietoja käsitellään
+  - key: Julkinen ssh-avain merkkijonona tai url-osoitteena
 
 ### a) & b) Salasanaton tunnus ja etähallinta Ansiblella
 
