@@ -1,4 +1,4 @@
-#### Raportti on keskeneräinen ja valmistuu myöhässä lopulliseen muotoonsa viimeistään klo 19:50 mennessä. 
+#### Raportti on keskeneräinen ja valmistuu myöhässä lopulliseen muotoonsa viimeistään klo 20:15 mennessä. 
 
 Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta -kurssin](https://terokarvinen.com/palvelinten-hallinta/) kotitehtävään _h2 Voileipä_.
 
@@ -8,7 +8,7 @@ Ympäristönä toimii Oraclen VirtualBoxiin asennettu Debian 13.7.0 -käyttöjä
 
 ### a) & b) Salasanaton tunnus ja etähallinta Ansiblella
 
-Käytössä olleelle etäpalvelimelle luotiin uusi käyttäjä `testuser`, jolle konfiguroitiin valmiiksi SSH-avaimella kirjautuminen sekä oikeus käyttää sudo-komentoja ilman salasanaa. Prosessi automatisoitiin Ansible-hallintatyökalulla.
+Käytössä olleelle kohdepalvelimelle luotiin Ansible-hallintatyökalun avulla uusi käyttäjä `testuser`, jolle konfiguroitiin valmiiksi SSH-avaimella kirjautuminen sekä oikeus käyttää sudo-komentoja ilman salasanaa. 
 
 Ensimmäisenä muokattiin Ansiblen inventaariotiedostoa `hosts.ini`, johon kohdekoneeksi määritettiin palvelimen IP-osoite ja yhteyskäyttäjäksi `ansible_user=root`. Tämä jälkimmäinen tuli lisätä siksi, että Ansible yrittää oletusarvoisesti kirjautua kohdepalvelimelle samalla paikallisella tunnuksella, jolla omalla koneella ollaan kirjautuneena. Kyseistä käyttäjätunnusta ei ole olemassa kohdepalvelimella, joten yhteys ei olisi muutoin muodostunut. 
 
@@ -63,7 +63,20 @@ x (execute) = suoritus
 
 Tiedostojen oikeudet esitetään kolmessa lohkossa, jotka määrittelevät järjestyksessä omistajan, omistavan ryhmän sekä muiden käyttäjien oikeudet. Tämän tiedoston kohdalla omistajalla on luku- ja kirjoitusoikeus, kun taas omistavalla ryhmällä ja muilla järjestelmän käyttäjillä on pelkät lukuoikeudet. Tässä yhteydessä tiedostolle ei ole määritetty suoritusoikeutta (`x`), joka tulisi tarpeen vasta mikäli tiedostoa olisi tarkoitus ajaa suoritettavana skriptinä tai ohjelmana. Käyttöoikeuksilla on omat numeroarvonsa, missä `r=4`, `w=2` ja `x=1`, mitkä yhteen laskemalla selittyy konfiguroimisessa käytetty oktaalinumero `0644`. Ensimmäinen arvo, tässä tapauksessa `0` viittaa erikoisoikeuksiin, joita ei yleensä tavanomaisissa tiedostoissa käytetä. (Red Hat 2023.)
 
-### e) 
+### e) Palvelimella pyörivän daemonin tilasta varmistuminen
+
+Aiemmassa vaiheessa palvelimelle asennetun Apache-verkkopalvelimen tilasta haluttiin varmistua erikseen Ansiblen avulla. Tässä hyödynnettiin Ansiblen dokumentaatiosta löytynyttä `ansible.builtin.systemd` -moduulia`, jonka avulla voitiin varmistaa, että kyseinen verkkopalvelin on aktiivisena. Tiedostoon `main.yml` tehty lisäys oli seuraavanlainen:
+
+```
+- name: Ensure Apache2 is running
+  ansible.builtin.systemd_service:
+    state: started
+    name: apache2
+```
+Playbookin ajamisen yhteydessä saatiin toivotun kaltainen ilmoitus:
+
+<img width="586" height="88" alt="Screenshot 2026-11-04 193703" src="https://github.com/user-attachments/assets/9f6cc73c-f2e4-41f8-b344-3f520e8bfe4f" />
+
 
 ### Lähteet
 
@@ -79,4 +92,4 @@ Karvinen, Tero 2026. Sudo without password. Luettavissa: https://terokarvinen.co
 
 Red Hat 2023. Linux file permissions explained. Luettavissa: https://www.redhat.com/en/blog/linux-file-permissions-explained. Luettu: 4.11.2026.
 
-Yaml Validate 2026. YAML Multiline Strings: When to Use |, >, |-, and >-. https://yamlvalidate.com/blog/yaml-multiline-strings/. Luettavissa: Luettu: 4.11.2026.
+Yaml Validate 2026. YAML Multiline Strings: When to Use |, >, |-, and >-. https://yamlvalidate.com/blog/yaml-multiline-strings/. Luettu: 4.11.2026.
