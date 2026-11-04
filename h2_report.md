@@ -63,9 +63,9 @@ x (execute) = suoritus
 
 Tiedostojen oikeudet esitetään kolmessa lohkossa, jotka määrittelevät järjestyksessä omistajan, omistavan ryhmän sekä muiden käyttäjien oikeudet. Tämän tiedoston kohdalla omistajalla on luku- ja kirjoitusoikeus, kun taas omistavalla ryhmällä ja muilla järjestelmän käyttäjillä on pelkät lukuoikeudet. Tässä yhteydessä tiedostolle ei ole määritetty suoritusoikeutta (`x`), joka tulisi tarpeen vasta mikäli tiedostoa olisi tarkoitus ajaa suoritettavana skriptinä tai ohjelmana. Käyttöoikeuksilla on omat numeroarvonsa, missä `r=4`, `w=2` ja `x=1`, mitkä yhteen laskemalla selittyy konfiguroimisessa käytetty oktaalinumero `0644`. Ensimmäinen arvo, tässä tapauksessa `0` viittaa erikoisoikeuksiin, joita ei yleensä tavanomaisissa tiedostoissa käytetä. (Red Hat 2023.)
 
-### e) Palvelimella pyörivän daemonin tilasta varmistuminen
+### e) Palvelimella pyörivän daemonin tilasta varmistuminen  
 
-Aiemmassa vaiheessa palvelimelle asennetun Apache-verkkopalvelimen tilasta haluttiin varmistua erikseen Ansiblen avulla. Tässä hyödynnettiin Ansiblen dokumentaatiosta löytynyttä `ansible.builtin.systemd` -moduulia`, jonka avulla voitiin varmistaa, että kyseinen verkkopalvelin on aktiivisena. Tiedostoon `main.yml` tehty lisäys oli seuraavanlainen:
+Aiemmassa vaiheessa palvelimelle asennetun Apache-verkkopalvelimen tilasta haluttiin varmistua erikseen Ansiblen avulla. Tässä hyödynnettiin Ansiblen dokumentaatiosta löytynyttä `ansible.builtin.systemd` -moduulia, jonka avulla voitiin varmistaa, että kyseinen verkkopalvelin on aktiivisena. Tiedostoon `main.yml` tehty lisäys oli seuraavanlainen:  
 
 ```
 - name: Ensure Apache2 is running
