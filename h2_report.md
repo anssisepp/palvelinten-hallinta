@@ -4,7 +4,14 @@ Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta
 
 Ympäristönä toimii Oraclen VirtualBoxiin asennettu Debian 13.7.0 -käyttöjärjestelmä. Virtuaalikoneen laitteistoresursseiksi on asetettu kaksi prosessoriydintä, 4 Gt keskusmuistia ja 40 Gt levytilaa. Harjoituksissa hyödynnetään lisäksi UpCloudin virtuaalipalvelinta.
 
-### x)
+#### x) [Karvinen 2026: Sudo without password](https://terokarvinen.com/passwordless-sudo/) / [Karvinen 2026: Passwordless Sudo with Ansible](https://terokarvinen.com/passwordless-sudo-with-ansible/)
+
+- konfiguroitaessa hyvä olla samanaikainen root-yhteys kohteeseen vikatilanteita varten
+- eduksi luoda asetustiedosto, joka sallii sudoless-ryhmän jäsenten käyttää `sudo`-komentoja ilman salasanakyselyä
+- tiedosto `/etc/sudoers.d/sudoless` sisältää rivin `%sudoless ALL = (ALL) NOPASSWD: ALL`
+- manuaalinen testaus ennen automaatiota
+- oikeuksien määritys yhteensopivin ja turvallisin oktaalimuotoisena (esim. 0644)
+  
 
 ### a) & b) Salasanaton tunnus ja etähallinta Ansiblella
 
