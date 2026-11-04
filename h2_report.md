@@ -1,4 +1,4 @@
-#### Raportti on keskeneräinen ja valmistuu myöhässä lopulliseen muotoonsa viimeistään klo 19:30 mennessä. 
+#### Raportti on keskeneräinen ja valmistuu myöhässä lopulliseen muotoonsa viimeistään klo 19:50 mennessä. 
 
 Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta -kurssin](https://terokarvinen.com/palvelinten-hallinta/) kotitehtävään _h2 Voileipä_.
 
@@ -40,7 +40,28 @@ Palvelimelle kirjautuneena todennettiin asennettujen ohjelmien olemassaolo ja ly
 
 <img width="1120" height="230" alt="Screenshot 2026-11-04 165355" src="https://github.com/user-attachments/assets/3c96afee-287a-4a88-9e6e-e6b21630ea8e" />
 
-### d)
+### d) Monirivisen tekstitiedoston lisäys ja oikeudet
+
+Kohdepalvelimelle luotiin useamman rivin mittainen tekstitiedosto lisäämällä `testuser`-roolin `main.yml`-tiedostoon uusi lohko. Tiedoston kohdepoluksi määritettiin käyttäjän kotihakemistossa sijaitseva `/home/testuser/testfile.txt` ja sen sisältö tuotettiin käyttämällä YAML-kielen tukemaa monirivistä putkimerkintää eli `|` (Yaml Validate 2026).
+
+<img width="690" height="300" alt="Screenshot 2026-11-04 175309" src="https://github.com/user-attachments/assets/466a25d6-5c7a-4f38-bc7a-27cf2a8e1133" />
+
+Samassa määritettiin tiedostolle omistajuudet asettamalla omistajaksi ja ryhmäksi `testuser` sekä käyttöoikeudet numeromuodossa `0644`. Lisäysten myötä tiedosto tallennettiin ja ajettiin jälleen `ansible-playbook site.yml`, minkä jälkeen luodun tiedoston olemassaolo, oikeudet ja sisältö todennettiin kohdepalvelimella ajamalla komennot `ls -l` sekä `cat testfile.txt`. 
+
+<img width="776" height="282" alt="Screenshot 2026-11-04 175503" src="https://github.com/user-attachments/assets/e0872c82-cabd-4f6b-b0d0-77f819e349d1" />
+
+Aiemmin mainittu `0644` vastaa käyttöliittymässä esitettynä muotoa `-rw-r--r--`. 
+
+Kirjaimilla symboloidaan oikeuksia seuraavasti:
+
+```
+r (read)    = luku
+w (write)   = kirjoitus
+x (execute) = suoritus
+-           = ei oikeuksia
+```
+
+Tiedostojen oikeudet esitetään kolmessa lohkossa, jotka määrittelevät järjestyksessä omistajan, omistavan ryhmän sekä muiden käyttäjien oikeudet. Tämän tiedoston kohdalla omistajalla on luku- ja kirjoitusoikeus, kun taas omistavalla ryhmällä ja muilla järjestelmän käyttäjillä on pelkät lukuoikeudet. Tässä yhteydessä tiedostolle ei ole määritetty suoritusoikeutta (`x`), joka tulisi tarpeen vasta mikäli tiedostoa olisi tarkoitus ajaa suoritettavana skriptinä tai ohjelmana. Käyttöoikeuksilla on omat numeroarvonsa, missä `r=4`, `w=2` ja `x=1`, mitkä yhteen laskemalla selittyy konfiguroimisessa käytetty oktaalinumero `0644`. Ensimmäinen arvo, tässä tapauksessa `0` viittaa erikoisoikeuksiin, joita ei yleensä tavanomaisissa tiedostoissa käytetä. (Red Hat 2023.)
 
 ### e) 
 
@@ -50,11 +71,12 @@ Karvinen, Tero 2026. Hello Ansible. Luettavissa: https://terokarvinen.com/hello-
 
 Karvinen, Tero 2026. Palvelinten hallinta -kurssi. Luettavissa: https://terokarvinen.com/palvelinten-hallinta/. Luettu: 30.10.2026. 
 
-Karvinen, Tero 2026. Passwordless Sudo with Ansible. Luettavissa: https://terokarvinen.com/passwordless-sudo-with-ansible/. Luettu: 30.10.2026.
+Karvinen, Tero 2026. Passwordless Sudo with Ansible. Luettavissa: https://terokarvinen.com/passwordless-sudo-with-ansible/. Luettu: 3.11.2026.
 
 Karvinen, Tero 2026. SSH public key - Login without password. Luettavissa: https://terokarvinen.com/ssh-public-key-login-without-password/. Luettu: 30.10.2026. 
 
-Karvinen, Tero 2026. Sudo without password. Luettavissa: https://terokarvinen.com/passwordless-sudo/. Luettu: 30.10.2026. 
+Karvinen, Tero 2026. Sudo without password. Luettavissa: https://terokarvinen.com/passwordless-sudo/. Luettu: 3.11.2026. 
 
+Red Hat 2023. Linux file permissions explained. Luettavissa: https://www.redhat.com/en/blog/linux-file-permissions-explained. Luettu: 4.11.2026.
 
-
+Yaml Validate 2026. YAML Multiline Strings: When to Use |, >, |-, and >-. https://yamlvalidate.com/blog/yaml-multiline-strings/. Luettavissa: Luettu: 4.11.2026.
