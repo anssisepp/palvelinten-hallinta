@@ -1,0 +1,30 @@
+Nov 05 17:23:40 debian-1cpu-1gb-fi-hel2 sudo[6929]: testuser : TTY=pts/1 ; PWD=/home/testuser ; USER=root ; COMMAND=/usr/bin/journalctl --grep caddy -n 30
+Nov 05 16:39:36 debian-1cpu-1gb-fi-hel2 sudo[6894]: testuser : TTY=pts/1 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/nano /etc/caddy/Caddyfile
+Nov 05 16:35:56 debian-1cpu-1gb-fi-hel2 sudo[6888]: testuser : TTY=pts/1 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/nano /etc/caddy/Caddyfile
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: {"level":"info","ts":1793896508.7013066,"logger":"tls","msg":"cleaning storage unit","description":"Fil>
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 systemd[1]: Started caddy.service - Caddy.
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: {"level":"info","ts":1793896508.697088,"msg":"autosaved config (load with --resume flag)","file":"/var/>
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: {"level":"info","ts":1793896508.6932704,"msg":"using provided configuration","config_file":"/etc/caddy/>
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: MEMORY_PRESSURE_WATCH=/sys/fs/cgroup/system.slice/caddy.service/memory.pressure
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: HOME=/var/lib/caddy
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: LOGNAME=caddy
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: USER=caddy
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: caddy.Version=2.6.2
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: caddy.ConfigAutosavePath=/var/lib/caddy/.config/caddy/autosave.json
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: caddy.AppConfigDir=/var/lib/caddy/.config/caddy
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: caddy.AppDataDir=/var/lib/caddy/.local/share/caddy
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 caddy[6882]: caddy.HomeDir=/var/lib/caddy
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 systemd[1]: Starting caddy.service - Caddy...
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 systemd[1]: Stopped caddy.service - Caddy.
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 systemd[1]: caddy.service: Deactivated successfully.
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 systemd[1]: Stopping caddy.service - Caddy...
+Nov 05 16:35:08 debian-1cpu-1gb-fi-hel2 sudo[6873]: testuser : TTY=pts/1 ; PWD=/var/www ; USER=root ; COMMAND=/usr/bin/systemctl restart caddy
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 caddy[6844]: {"level":"info","ts":1793895834.7017987,"logger":"tls","msg":"cleaning storage unit","description":"Fil>
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 systemd[1]: Started caddy.service - Caddy.
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 caddy[6844]: {"level":"info","ts":1793895834.701078,"msg":"autosaved config (load with --resume flag)","file":"/var/>
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 caddy[6844]: {"level":"info","ts":1793895834.6970747,"msg":"using provided configuration","config_file":"/etc/caddy/>
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 caddy[6844]: MEMORY_PRESSURE_WATCH=/sys/fs/cgroup/system.slice/caddy.service/memory.pressure
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 caddy[6844]: HOME=/var/lib/caddy
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 caddy[6844]: LOGNAME=caddy
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 caddy[6844]: USER=caddy
+Nov 05 16:23:54 debian-1cpu-1gb-fi-hel2 caddy[6844]: caddy.Version=2.6.2
