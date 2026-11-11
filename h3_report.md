@@ -1,9 +1,25 @@
 Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta -kurssin](https://terokarvinen.com/palvelinten-hallinta/) kotitehtävään _h3 Demoni_.
 
-#### x) 
+#### x) [Karvinen 2026: Apache installed with Ansible - quick notes](https://terokarvinen.com/apache-ansible/)
 
-Päivittyy tähän myöhemmin.
+- Apache2:n asennus Ansiblella ja sivujen muokkaus ilman root-oikeuksia
+- `package-file-service` roolien rakenteen perustana (asenna, muokkaa, uudelleenkäynnistä) 
+- asetusmuutosten tulee aktivoida uudelleenkäynnistys automaattisesti nk. _handlerien_ avulla
 
+#### [Ansible Community Documentation: Handlers: running operations on change](https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_handlers.html)
+- handlerit suoritetaan kun tehtävä ilmoittaa muutoksesta `notify`-rivin myötä (esim. `notify: restart apache2`)
+- handleria kutsutaan omalla nimellä (esim. `name: restart apache2`)
+- suoritetaan vasta tehtävien jälkeen
+- sama handler suoritetaan vain kerran vaikka moni tehtävä sitä kutsuisi
+- useamman handlerin voi yhdistää `listen`-avainsanalla
+
+#### 'ansible-doc service'
+- ohjaa ja valvoo etäkoneiden daemoneja riippumatta mitä järjestelmää kohdekone käyttää
+- `name` hallittavan palvelun nimi 
+- `enabled` määrittää käynnistyykö palvelu käynnistyksen yhteydessä vai ei
+- `state` palvelun haluttu tila (`started`, `stopped`, `restarted`, `reloaded`) 
+- `enabled` tai `state` vähintään yksi on määritettävä 
+  
 ### a) Apache2-verkkopalvelimen asennus
 
 Ensimmäiseksi tarkistettiin palvelimelle mahdollisesti jo aiemmin asennetut web-palvelimet komennolla `dpkg -l | grep -E "apache2|nginx|caddy"`. Tässä `dpkg -l` listasi kaikki asennetut paketit ja `grep -E` suodatti tulosteesta esiin vain halutut palvelinohjelmistot. Komentorivillä oli nähtävillä, että Apache2 (tai ainakin sen moduuleita) sekä Caddy olivat koneella asennettuina. Komennolla `sudo ss -tulpn | grep 80` nähtiin lisäksi, että portissa 80 liikennettä kuunteli Caddy. `ss -tulpn` listaa kaikki järjestelmän kuuntelevat portit sekä niitä käyttävät prosessit. 
@@ -66,12 +82,13 @@ Ansiblen pelikirjaan eli `site.yml` tiedostoon puolestaan lisättiin roolien all
 
 ### Lähteet
 
-Karvinen, Tero 2026. Hello Ansible. Luettavissa: https://terokarvinen.com/hello-ansible/. Luettu: 30.10.2026. 
+Gite, Vivek 2025. Apache 403 Forbidden Error and Solution. Luettavissa: https://www.cyberciti.biz/faq/apache-403-forbidden-error-and-solution/. Luettu: 11.11.2026.
 
-Karvinen, Tero 2026. Palvelinten hallinta -kurssi. Luettavissa: https://terokarvinen.com/palvelinten-hallinta/. Luettu: 8.10.2026. 
+Karvinen, Tero 2026. Hello Ansible. Luettavissa: https://terokarvinen.com/hello-ansible/. Luettu: 8.11.2026. 
+
+Karvinen, Tero 2016. New Default Website with Apache2 – Show your homepage at top of example.com, no tilde. Luettavissa: https://terokarvinen.com/2016/new-default-website-with-apache2-show-your-homepage-at-top-of-example-com-no-tilde/. Luettu: 11.11.2026.
+
+Karvinen, Tero 2026. Palvelinten hallinta -kurssi. Luettavissa: https://terokarvinen.com/palvelinten-hallinta/. Luettu: 8.11.2026. 
 
 Red Hat 2023. Linux file permissions explained. Luettavissa: https://www.redhat.com/en/blog/linux-file-permissions-explained. Luettu: 7.11.2026.
-
-
-
 
