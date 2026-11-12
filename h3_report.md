@@ -66,7 +66,7 @@ Ohjelma käynnistettiin uudelleen ja varmistuttiin `curl`-työkalun avulla, ett�
 
 ### c) Nginx asennus Ansiblella
 
-##### Kohdan vastausta päivitetty 12.11.2026 klo 17:38. Alkuperäinen suppeampi vastaus tämän alla.
+##### Kohdan vastausta päivitetty 12.11.2026 klo 18:28. Alkuperäinen suppeampi vastaus tämän alla.
 
 Seuraavaksi automatisoitiin Nginxin asennus suorittamalla Ansiblen avulla sekä ohjelman asennus, että yksinkertaisen konfiguraatiotiedoston siirto kohdepalvelimelle. Aivan aluksi palvelimelta poistettiin aiempi `nginx`-paketin asennus ajamalla paikallisesti komento `sudo apt purge nginx` ja `curl`-työkalulla varmistuttiin, että sivu ei ollut enää saatavilla.
 
@@ -102,10 +102,8 @@ Files-kansioon sijoitettiin Nginxin yksinkertainen määrittelytiedosto, jonka A
 ```
 server {
     listen 80;
-    server_name example.com www.example.com;
 
     root /home/testuser/publicsite;
-    index index.html;
 
     location / {
         try_files $uri $uri/ =404;
