@@ -66,6 +66,69 @@ Ohjelma käynnistettiin uudelleen ja varmistuttiin `curl`-työkalun avulla, ett�
 
 ### c) Nginx asennus Ansiblella
 
+##### Kohdan vastausta päivitetty 12.11.2026 klo 17:38. Alkuperäinen suppeampi vastaus tämän alla.
+
+Seuraavaksi automatisoitiin Nginxin asennus suorittamalla Ansiblen avulla sekä ohjelman asennus, että yksinkertaisen konfiguraatiotiedoston siirto kohdepalvelimelle. Aivan aluksi palvelimelta poistettiin aiempi `nginx`-paketin asennus ajamalla paikallisesti komento `sudo apt purge nginx` ja `curl`-työkalulla varmistuttiin, että sivu ei ollut enää saatavilla.
+
+Ansibleen luotiin uusi rooli `nginx`, minkä alle sijoittuivat kansiot `tasks`, `files` ja `handlers`. Tässä käytetiin koodien pohjana [Teron Apachen asennus Ansiblella](https://terokarvinen.com/apache-ansible/) -esimerkkiä.
+
+Tasks-kansion alle `main.yml` tiedostoon sijoitettiin `apt`, `copy` ja `file` -moduulit sisältävä koodi, missä määriteltiin `nginx`-paketin asennus ja tiedoston siirto kohdepalvelimelle:
+
+```
+- apt:
+    name: nginx
+    state: present
+
+- copy:
+    dest: "/etc/nginx/sites-available/testisivu.fi.conf"
+    src: "testisivu.fi.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  notify: restart nginx
+
+- file:
+    src: /etc/nginx/sites-available/testisivu.fi.conf
+    dest: /etc/nginx/sites-enabled/testisivu.fi.conf
+    owner: root
+    group: root
+    state: link
+  notify: restart nginx
+
+```
+
+Files-kansioon sijoitettiin Nginxin yksinkertainen määrittelytiedosto, jonka Ansible kopioi kohdepalvelimelle. Tiedosto `index.html` oli tässä tapauksessa kohdepalvelimella jo valmiina.
+
+```
+server {
+    listen 80;
+    server_name example.com www.example.com;
+
+    root /home/testuser/publicsite;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+```
+
+Handlers-kansioon luotiin `main.yml`-tiedosto, missä määriteltiin Nginxin uudelleenkäynnistys aina kun sitä kutsutaan `copy` tai `file` -moduulien `notify` riveiltä.
+
+```                                           
+- name: restart nginx
+  systemd:
+    name: nginx
+    state: restarted
+```
+
+Lopuksi ajettiin `ansible-playbook site.yml` ja varmistuttiin tulosteen sekä `curl` avulla, että määritykset onnistuivat ja web-palvelin oli noussut käyntiin.
+
+<img width="798" height="580" alt="Screenshot 2026-11-12 171452" src="https://github.com/user-attachments/assets/1dbb219c-9287-4ea7-9607-e8222148f48a" />
+
+
+##### Alkuperäinen suppea vastaus:
+
 Seuraavaksi lisättiin virtuaalikoneella Ansiblelle uusi rooli, joka suorittaa kohdepalvelimelle Nginx-webpalvelinsovelluksen asentamisen. Polussa `/ansible/roles/nginx/tasks/main.yml` roolin määrittelytiedostoon lisättiin seuraava `apt`-moodulin lohko:
 
 ```
@@ -79,6 +142,7 @@ Seuraavaksi lisättiin virtuaalikoneella Ansiblelle uusi rooli, joka suorittaa k
 Ansiblen pelikirjaan eli `site.yml` tiedostoon puolestaan lisättiin roolien alle kyseinen uusi `nginx`-rooli, jotta se sisältyisi osaksi pelikirjan suoritusta. Kun ajettiin komento `ansible-playbook site.yml`, tulosteen yhteenvedosta nähtiin kohdasta `changed=0`, että uusia muutoksia kohdepalvelimelle ei odotetusti tehty, sillä Nginx oli jo palvelimelle asennettuna. 
 
 <img width="610" height="186" alt="Screenshot 2026-11-11 165003" src="https://github.com/user-attachments/assets/d5ddd740-865f-4032-8994-f00d177af4be" />
+
 
 ### Lähteet
 
