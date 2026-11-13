@@ -66,13 +66,15 @@ Ohjelma käynnistettiin uudelleen ja varmistuttiin `curl`-työkalun avulla, ett�
 
 ### c) Nginx asennus Ansiblella
 
-##### Kohdan vastausta päivitetty 12.11.2026 klo 18:28. Alkuperäinen suppeampi vastaus tämän alla.
+##### Kohdan vastausta päivitetty 13.11.2026 klo 16:45. Alkuperäinen suppeampi vastaus tämän alla.
 
-Seuraavaksi automatisoitiin Nginxin asennus suorittamalla Ansiblen avulla sekä ohjelman asennus, että yksinkertaisen konfiguraatiotiedoston siirto kohdepalvelimelle. Aivan aluksi palvelimelta poistettiin aiempi `nginx`-paketin asennus ajamalla paikallisesti komento `sudo apt purge nginx` ja `curl`-työkalulla varmistuttiin, että sivu ei ollut enää saatavilla.
+Seuraavaksi automatisoitiin Nginxin asennus suorittamalla Ansiblen avulla ohjelman asennus ja tiedostojen siirto kohdepalvelimelle. Aivan aluksi palvelimelta poistettiin aiempi `nginx`-paketin asennus ajamalla paikallisesti komento `sudo apt purge nginx` ja `curl`-työkalulla varmistuttiin, että sivu ei ollut enää saatavilla.
 
-Ansibleen luotiin uusi rooli `nginx`, minkä alle sijoittuivat kansiot `tasks`, `files` ja `handlers`. Tässä käytetiin koodien pohjana [Teron Apachen asennus Ansiblella](https://terokarvinen.com/apache-ansible/) -esimerkkiä.
+Ansibleen luotiin uusi rooli `nginx`, minkä alle sijoittuivat kansiot `tasks`, `files` ja `handlers`. Tässä käytetiin koodien pohjana [Teron Apachen asennus Ansiblella](https://terokarvinen.com/apache-ansible/) -esimerkkiä. 
 
-Tasks-kansion alle `main.yml` tiedostoon sijoitettiin `apt`, `copy` ja `file` -moduulit sisältävä koodi, missä määriteltiin `nginx`-paketin asennus ja tiedoston siirto kohdepalvelimelle:
+<img width="346" height="246" alt="Screenshot 2026-11-13 162254" src="https://github.com/user-attachments/assets/79b7eaa5-9648-4284-9911-bd301a39b14a" />
+
+Tasks-kansiossa `main.yml`-tiedostoon sijoitettiin `apt`, `copy` ja `file` -moduulit sisältävä koodi. Tehtävät asentavat `nginx`-paketin, kopioivat sivuston konfiguraatiotiedoston `testisivu.fi.conf` hakemistoon `/etc/nginx/sites-available/` root-käyttäjän oikeuksilla ja aktivoivat sen luomalla symbolisen linkin hakemistoon `/etc/nginx/sites-enabled/`. Muutokset laukaisevat Nginxin uudelleenkäynnistyksen viittaamalla handleriin rivillä `notify: restart nginx`. Lisäksi kopioitiin verkkosivun sisältö tiedostossa `index.html` käyttäjän testuser kotihakemistossa sijaitsevaan `publicsite`-kansioon testuser-käyttäjän omistajuudella. 
 
 ```
 - apt:
@@ -95,13 +97,20 @@ Tasks-kansion alle `main.yml` tiedostoon sijoitettiin `apt`, `copy` ja `file` -m
     state: link
   notify: restart nginx
 
+- copy:
+    src: index.html
+    dest: /home/testuser/publicsite/index.html
+    owner: testuser
+    group: testuser
+    mode: '0644'
 ```
 
-Files-kansioon sijoitettiin Nginxin yksinkertainen määrittelytiedosto, jonka Ansible kopioi kohdepalvelimelle. Tiedosto `index.html` oli tässä tapauksessa kohdepalvelimella jo valmiina.
+Files-kansioon sijoitettiin Nginxin yksinkertainen määrittelytiedosto, jonka Ansible kopioi kohdepalvelimelle. Tiedoston pohja löytyi alunperin [Contabo-sivustolta](https://contabo.com/blog/nginx-configuration-beginners-guide/), mutta oppitunnilla 12.11.2026 aihetta käsiteltiin, minkä jälkeen koodista otettiin pois muutama tarpeeton rivi. Tiedostossa määritellään kuunneltavat portit, sivuston juurihakemisto sekä viimeisenä 404-virheilmoitus jos pyydettyä tiedostoa ei löydy. Tässä tapauksessa ei ole käytössä varsinaisia domain-osoitteita, joten kaikki palvelimen ip-osoitteeseen tuleva liikenne ohjataan palvelimella suoraan käyttäjän kotihakemistoon `/home/testuser/publicsite/`.
 
 ```
 server {
     listen 80;
+    listen 94.237.9.166;
 
     root /home/testuser/publicsite;
 
@@ -111,7 +120,7 @@ server {
 }
 ```
 
-Handlers-kansioon luotiin `main.yml`-tiedosto, missä määriteltiin Nginxin uudelleenkäynnistys aina kun sitä kutsutaan `copy` tai `file` -moduulien `notify` riveiltä.
+Handlers-kansioon luotiin `main.yml`-tiedosto, missä määriteltiin Nginxin uudelleenkäynnistys aina kun sitä kutsutaan `copy` tai `file` -moduulien `notify`-riveiltä.
 
 ```                                           
 - name: restart nginx
@@ -122,7 +131,8 @@ Handlers-kansioon luotiin `main.yml`-tiedosto, missä määriteltiin Nginxin uud
 
 Lopuksi ajettiin `ansible-playbook site.yml` ja varmistuttiin tulosteen sekä `curl` avulla, että määritykset onnistuivat ja web-palvelin oli noussut käyntiin.
 
-<img width="798" height="580" alt="Screenshot 2026-11-12 171452" src="https://github.com/user-attachments/assets/1dbb219c-9287-4ea7-9607-e8222148f48a" />
+<img width="960" height="564" alt="Screenshot 2026-11-13 164509" src="https://github.com/user-attachments/assets/7dbe84cc-e502-4673-b0a2-02c8847bfaa3" />
+
 
 
 ##### Alkuperäinen suppea vastaus:
@@ -144,6 +154,8 @@ Ansiblen pelikirjaan eli `site.yml` tiedostoon puolestaan lisättiin roolien all
 
 ### Lähteet
 
+Contabo 2026. NGINX Configuration Beginner’s Guide. Luettavissa: https://contabo.com/blog/nginx-configuration-beginners-guide/. Luettu 12.11.2026.
+
 Gite, Vivek 2025. Apache 403 Forbidden Error and Solution. Luettavissa: https://www.cyberciti.biz/faq/apache-403-forbidden-error-and-solution/. Luettu: 11.11.2026.
 
 Karvinen, Tero 2026. Hello Ansible. Luettavissa: https://terokarvinen.com/hello-ansible/. Luettu: 8.11.2026. 
@@ -153,4 +165,9 @@ Karvinen, Tero 2016. New Default Website with Apache2 – Show your homepage at 
 Karvinen, Tero 2026. Palvelinten hallinta -kurssi. Luettavissa: https://terokarvinen.com/palvelinten-hallinta/. Luettu: 8.11.2026. 
 
 Red Hat 2023. Linux file permissions explained. Luettavissa: https://www.redhat.com/en/blog/linux-file-permissions-explained. Luettu: 7.11.2026.
+
+
+
+
+
 
