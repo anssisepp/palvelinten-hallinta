@@ -1,4 +1,4 @@
-### Tehtävä palautunut määräaikaan mennessä raakileena. Päivittyy lopulliseen muotoonsa viimeistään 18.11. klo 20.
+### Tehtävä palautunut määräaikaan mennessä raakileena. Päivittyy lopulliseen muotoonsa viimeistään 18.11. klo 22.
 
 Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta -kurssin](https://terokarvinen.com/palvelinten-hallinta/) kotitehtävään _h4 Pizza Fantasia_.
 
@@ -76,8 +76,38 @@ Ansiblen playbook-tiedostoon `site.yml` lisättiin suoritettavien roolien listaa
 
 <img width="1076" height="118" alt="Screenshot 2026-11-18 170405" src="https://github.com/user-attachments/assets/74ab5c3f-faad-40f9-885d-6eae7a1e1798" />
 
-### c) 
-_päivittyy myöhemmin_
+### c) Asetustiedoston muuttaminen
+
+Seuraavaksi tarkoituksenani oli pyrkiä todentamaan proxyn toimivuus suorittamalla ulkoinen yhteystesti. Tämä kuitenkin pysähtyi heti herjaan `Could not connect to server`. Syyksi paljastui UpCloudin palomuurisäännöt, jotka estivät kaikki yhteydet porttiin 3128. Näiden sääntöjen muokkaaminen ei ollut UpCloudin maksuttoman kokeilutilauksen puitteissa mahdollista, joten palomuurin kiertämiseksi ja porttien vaihtamisen sijaan päätin luoda ssh-tunnelin paikallisen koneen ja palvelimen välille avaamalla uuteen terminaali-ikkunaan komento `ssh -N -L 3128:localhost:3128 testuser@94.237.9.166` ja jättäen kyseinen ikkuna avoimeksi taustalle. Määritys `-L 3128:localhost:3128` ohjaa paikallisen koneen portin 3128 suoraan etäpalvelimen porttiin 3128. `-N` puolestaan pitää ikkunan pelkkänä taustatunnelina eikä avaa erillistä uutta komentorivi-istuntoa. (Devcloudlab 2026.)
+
+Tämän jälkeen yhteys toimi. Epäonnistuneen komennon muoto:  
+`curl -x http://94.237.9.166:3128 httpbin.org/user-agent`   
+Muuttui SSH-tunnelin myötä muotoon:  
+`curl -x localhost:3128 httpbin.org/user-agent`.   
+
+Seuraavaksi paikallisella virtuaalikoneella muokattiin `squid.conf`-tiedostoa niin, että estettäisiin sosiaalisen median palvelut. Tiedostoon lisättiin rivit:
+
+```
+acl domain_blacklist dstdomain "/etc/squid/domain_blacklist.txt"
+http_access deny domain_blacklist
+```
+
+Ensimmäisellä rivillä määriteltiin pääsylista (_access control list_), joka lukee estettävät verkkotunnukset määritetyssä polussa sijaitsevasta tiedostosta. Tässä tapauksessa kyseiseen uuteen tekstitiedostoon lisättiin `.facebook.com`, `.instagram.com` ja `.tiktok.com`. Toisella rivillä otettiin kyseinen pääsylista käyttöön kieltämällä kaikki pyynnöt, jotka vastaavat estolistalla olevia verkkotunnuksia. Uuden tiedoston vuoksi `tasks/main.yml` lisättiin kyseisen tiedoston kohdepalvelimelle siirtävä lohko: 
+
+```
+- copy:
+    src: domain_blacklist.txt
+    dest: /etc/squid/domain_blacklist.txt
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart squid
+```
+
+Lopuksi konfiguraatio vietiin palvelimelle Ansiblella, ja estolistan toimivuus varmistettiin testikomennolla, joka palautti odotetusti `403 Forbidden` -virheen eli välityspalvelin kieltäytyi käsittelemästä pyyntöä sivustolle facebook.com.
+
+<img width="902" height="62" alt="Screenshot 2026-11-18 195748" src="https://github.com/user-attachments/assets/cb6f4f71-72fc-4d8c-9dbf-f0e91f5e9754" />
+
 
 ### d)
 _päivittyy myöhemmin_
@@ -87,6 +117,8 @@ _päivittyy myöhemmin_
 
 
 ### Lähteet
+
+DevCloudLab. SSH Tunneling Explained: -L, -R, and -D Port Forwarding. Luettavissa: https://devcloudlab.com/blog/ssh-tunneling-explained/. Luettu 18.11.2026.
 
 Karvinen, Tero 2026. Hello Ansible. Luettavissa: https://terokarvinen.com/hello-ansible/. Luettu: 17.11.2026. 
 
