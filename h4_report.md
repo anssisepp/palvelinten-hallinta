@@ -8,22 +8,24 @@ _täydentyy myöhemmin_
   
 ### a) Squid-proxyn manuaalinen asennus
 
-Päätin asentaa Squid-daemonin, mikä on yleisesti käytetty välityspalvelin, jonka avulla on mahdollista ohjata, suodattaa ja hallita verkkoliikennettä sekä hyödyntää välimuistia.
+Päätin asentaa Squid-daemonin, mikä on yleisesti käytetty välityspalvelin, jonka avulla on mahdollista ohjata, suodattaa ja hallita verkkoliikennettä sekä hyödyntää välimuistia. Asennus suoritettiin manuaalisesti suoraan kohdepalvelimella pakettienhallinnan kautta komennolla `sudo apt update && sudo apt install squid`.
 
-Asennus suoritettiin manuaalisesti suoraan kohdepalvelimella pakettien hallinnan kautta komennolla `sudo apt update && sudo apt install squid`.
+Ensin tarkistettiin, että asennus onnistui ja daemon oli käynnissä komennolla `systemctl status squid`, minkä jälkeen varmistettiin, että daemon kuunteli oletusportissa 3128 komennolla `sudo ss -tulpn | grep squid`:
 
-Ensin tarkistettiin, että asennus onnistui ja daemon oli käynnissä komennolla `systemctl status squid`, minkä jälkeen varmistettiin, että Squid-daemon kuunteli oletusportissa 3128 komennolla `sudo ss -tulpn | grep squid`.
+<img width="1478" height="182" alt="Screenshot 2026-11-18 152538" src="https://github.com/user-attachments/assets/2e2896ef-9cd7-4215-9de0-17b3dc47c8d0" />
 
-Proxyn toimivuutta testattiin suoraan etäpalvelimelta käsin curl-komennolla käyttämällä `-x`-lippua. Testattaessa käytettiin muutamia yleisiä verkkosivuja sekä kevyitä ja selkeitä testiosoitteita, kuten `httpbin.org/ip` ja `httpbin.org/user-agent`, jotta tulosteet pysyisivät lyhyinä ja selkeinä alla olevaa kuvakaappausta varten.
+Proxyn toimivuutta kokeiltiin paikallisesti `curl`-työkalulla. Testattaessa käytettiin muutamia yleisiä verkkosivuja sekä kevyitä ja selkeitä testiosoitteita, kuten `httpbin.org/ip` ja `httpbin.org/user-agent`, jotta tulosteet pysyisivät lyhyinä ja selkeinä alla olevaa kuvakaappausta varten.
 
-`curl -x localhost:3128 http://httpbin.org/ip`
+Esimerkki käytetystä komennosta: `curl -x localhost:3128 http://httpbin.org/ip`
 
-`curl` käytetty työkalu 
-`-x` määrittää käyttämään välityspalvelinta
-`localhost:3128` välityspalvelimen osoite ja portti 
-`http://httpbin.org/ip` haettava kohde-url
+- `curl` työkalu verkkosivujen hakemiseen 
+- `-x` määrittää käyttämään välityspalvelinta
+- `localhost:3128` välityspalvelimen osoite ja portti 
+- `http://httpbin.org/ip` käytettävä kohde-url
 
-Välityspalvelin tallentaa tietoja tehdyistä pyynnöistä lokitiedostoon hakemistossa `/var/log/squid/access.log`. Lokista havaittiin onnistuneet pyynnöt (esim. `TCP_REFRESH_MODIFIED/200` ja `TCP_TUNNEL/200`), mikä todisti, että verkkoliikenne kulki ohjatusti Squidin läpi eikä suoraan internetiin.
+<img width="1686" height="394" alt="Screenshot 2026-11-18 155241" src="https://github.com/user-attachments/assets/54f49a12-7865-45fc-8831-61072de2fed4" />
+
+Kuvassa alimpana näkyy välityspalvelimen lokitiedostoon (`/var/log/squid/access.log`) tallennettuja tietoja tehdyistä pyynnöistä. Onnistuneiden pyyntöjen perässä näkyy HTTP-tilakoodi 200 (OK), mikä todisti, että verkkoliikenne kulki halutulla tavalla välityspalvelimen kautta eikä suoraan internetiin. Listalla näkyvä 301-tilakoodilla (_Moved Permanently_) varustettu rivi johtui kokeilusta kohde-URL:llä `yle.fi`. Oletusarvoisesti `curl` ei seuraa uudelleenohjauksia, joten pyyntö pysähtyi tähän kyseiseen ohjausviestiin. Ohjausten seuraaminen automaattisesti edellyttäisi lisämäärettä `-L` eli komento olisi kokonaisuudessaan `curl -L  -x http://localhost:3128 yle.fi`.
 
 Squidin konfiguraatiotiedosto sijaitsi hakemistossa `/etc/squid/squid.conf`. Vielä tässä vaiheessa siihen ei kajottu.
 
