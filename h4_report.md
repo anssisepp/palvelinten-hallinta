@@ -1,10 +1,11 @@
-### Tehtävä palautunut määräaikaan mennessä raakileena. Päivittyy lopulliseen muotoonsa viimeistään 18.11. klo 22.
-
 Tämä dokumentti on kirjoitettu vastauksena [Tero Karvisen Palvelinten hallinta -kurssin](https://terokarvinen.com/palvelinten-hallinta/) kotitehtävään _h4 Pizza Fantasia_.
+
+Ympäristönä toimi Oraclen VirtualBoxiin asennettu Debian 13.7.0 -käyttöjärjestelmä. Virtuaalikoneen laitteistoresursseiksi on asetettu kaksi prosessoriydintä, 4 Gt keskusmuistia ja 40 Gt levytilaa. Harjoituksissa hyödynnetään lisäksi UpCloudin virtuaalipalvelinta.
 
 #### x) [Karvinen 2023: Configuration Management of Distributed Systems over Unreliable and Hostile Networks](https://westminsterresearch.westminster.ac.uk/item/w7vvz/configuration-management-of-distributed-systems-over-unreliable-and-hostile-networks)
 
-_täydentyy myöhemmin_
+- gdfg
+- dfg
   
 ### a) Squid-proxyn manuaalinen asennus
 
@@ -72,13 +73,16 @@ Vielä ennen Ansible-automaation ajamista kohdassa a) manuaalisesti asennettu da
 
 Ansiblen playbook-tiedostoon `site.yml` lisättiin suoritettavien roolien listaan kyseinen uusi rooli `squid`, minkä jälkeen ajettiin `ansible-playbook site.yml` ja varmistuttiin tulosteesta sekä palvelimen päässä, että asennus oli onnistunut.
 
-<img width="952" height="418" alt="Screenshot 2026-11-18 181758" src="https://github.com/user-attachments/assets/d90d7211-2add-4800-9d25-f915a7ef72ef" />
-
-<img width="1076" height="118" alt="Screenshot 2026-11-18 170405" src="https://github.com/user-attachments/assets/74ab5c3f-faad-40f9-885d-6eae7a1e1798" />
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/d90d7211-2add-4800-9d25-f915a7ef72ef" width="100%" /></td>
+    <td><img src="https://github.com/user-attachments/assets/74ab5c3f-faad-40f9-885d-6eae7a1e1798" width="100%" /></td>
+  </tr>
+</table>
 
 ### c) Asetustiedoston muuttaminen
 
-Seuraavaksi tarkoituksenani oli pyrkiä todentamaan proxyn toimivuus suorittamalla ulkoinen yhteystesti. Tämä kuitenkin pysähtyi heti herjaan `Could not connect to server`. Syyksi paljastui UpCloudin palomuurisäännöt, jotka estivät kaikki yhteydet porttiin 3128. Näiden sääntöjen muokkaaminen ei ollut UpCloudin maksuttoman kokeilutilauksen puitteissa mahdollista, joten palomuurin kiertämiseksi ja porttien vaihtamisen sijaan päätin luoda ssh-tunnelin paikallisen koneen ja palvelimen välille avaamalla uuteen terminaali-ikkunaan komento `ssh -N -L 3128:localhost:3128 testuser@94.237.9.166` ja jättäen kyseinen ikkuna avoimeksi taustalle. Määritys `-L 3128:localhost:3128` ohjaa paikallisen koneen portin 3128 suoraan etäpalvelimen porttiin 3128. `-N` puolestaan pitää ikkunan pelkkänä taustatunnelina eikä avaa erillistä uutta komentorivi-istuntoa. (Devcloudlab 2026.)
+Seuraavaksi tarkoituksenani oli pyrkiä todentamaan proxyn toimivuus suorittamalla ulkoinen yhteystesti. Tämä kuitenkin pysähtyi heti herjaan `Could not connect to server`. Syyksi paljastui UpCloudin palomuurisäännöt, jotka estivät kaikki yhteydet porttiin 3128. Näiden sääntöjen muokkaaminen ei ollut UpCloudin maksuttoman kokeilutilauksen puitteissa mahdollista, joten palomuurin kiertämiseksi ja porttien vaihtamisen sijaan päätin luoda ssh-tunnelin paikallisen koneen ja palvelimen välille avaamalla uuteen terminaali-ikkunaan komennon `ssh -N -L 3128:localhost:3128 testuser@94.237.9.166` ja jättäen kyseinen ikkuna avoimeksi taustalle. Määritys `-L 3128:localhost:3128` ohjaa paikallisen koneen portin 3128 suoraan etäpalvelimen porttiin 3128. `-N` puolestaan pitää ikkunan pelkkänä taustatunnelina eikä avaa erillistä uutta komentorivi-istuntoa. (DevCloudLab 2026.)
 
 Tämän jälkeen yhteys toimi. Epäonnistuneen komennon muoto:  
 `curl -x http://94.237.9.166:3128 httpbin.org/user-agent`   
@@ -109,27 +113,37 @@ Lopuksi konfiguraatio vietiin palvelimelle Ansiblella, ja estolistan toimivuus v
 <img width="902" height="62" alt="Screenshot 2026-11-18 195748" src="https://github.com/user-attachments/assets/cb6f4f71-72fc-4d8c-9dbf-f0e91f5e9754" />
 
 
-### d)
-_päivittyy myöhemmin_
+### d) Rikkinäiset asetukset
 
-### e) 
-_päivittyy myöhemmin_
+Tämän jälkeen palvelimella suoritettiin paikallisesti tarkoituksella kokonaisuutta hajottavia toimia. Asetustiedosto `squid.conf` poistettiin kokonaan, minkä jälkeen ohjelman uudelleenkäynnistyksen ja tilan tarkistamisen yhteydessä törmättiin odotetun kaltaiseen vikailmoitukseen:
+
+<img width="1088" height="196" alt="Screenshot 2026-11-18 205711" src="https://github.com/user-attachments/assets/e64b75bf-7c6f-4d98-9508-bd116a49c25a" />  
+
+Asia korjaantui nopeasti normaaliksi ajamalla jälleen hallinnoivalla koneella `ansible-playbook site.yml`, jolloin puuttuva tiedosto luotiin uudelleen ja ohjelma käynnistettiin uudelleen:
+
+<table>
+  <tr>
+    <td><img src="https://github.com/user-attachments/assets/f457781b-275d-45c1-82e9-3e665692c2ac" width="100%" /></td>
+    <td><img src="https://github.com/user-attachments/assets/71f73d45-2b81-49fb-a838-24415907a5fd" width="100%" /></td>
+  </tr>
+</table>
+
+
+### e) Idempontentti
+
+Määritysten idempotenssi on helppo todeta ajamalla playbook-komento uudelleen. Tässä tapauksessa, koska järjestelmä oli jo valmiiksi halutussa tilassa eikä muutoksia tarvittu, Ansiblen suorituksen yhteenvedon `changed=0` osoittaa, että toistuvat ajot eivät aiheuta tarpeettomia muutoksia.
+
+<img width="970" height="84" alt="Screenshot 2026-11-18 211249" src="https://github.com/user-attachments/assets/4813fb89-1207-4bbc-b058-d0d32fd32886" />
 
 
 ### Lähteet
 
-DevCloudLab. SSH Tunneling Explained: -L, -R, and -D Port Forwarding. Luettavissa: https://devcloudlab.com/blog/ssh-tunneling-explained/. Luettu 18.11.2026.
+DevCloudLab. SSH Tunneling Explained: -L, -R, and -D Port Forwarding. Luettavissa: https://devcloudlab.com/blog/ssh-tunneling-explained/. Luettu: 18.11.2026.
 
 Karvinen, Tero 2026. Hello Ansible. Luettavissa: https://terokarvinen.com/hello-ansible/. Luettu: 17.11.2026. 
 
 Karvinen, Tero 2026. Palvelinten hallinta -kurssi. Luettavissa: https://terokarvinen.com/palvelinten-hallinta/. Luettu: 15.11.2026. 
 
-Red Hat 2023. Linux file permissions explained. Luettavissa: https://www.redhat.com/en/blog/linux-file-permissions-explained. Luettu: 15.11.2026.
+Red Hat Documentation. 16.4. Configuring a Domain Blacklist in Squid. Luettavissa: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/networking_guide/configuring-a-domain-blacklist-in-squid. Luettu 18.11.2026.
 
 Ubuntu Server documentation. About Squid proxy servers. Luettavissa: https://ubuntu.com/server/docs/explanation/web-services/about-squid-proxy-servers/. Luettu 18.11.2026.
-
-
-
-
-
-
