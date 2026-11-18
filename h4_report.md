@@ -4,8 +4,7 @@ Ympäristönä toimi Oraclen VirtualBoxiin asennettu Debian 13.7.0 -käyttöjär
 
 #### x) [Karvinen 2023: Configuration Management of Distributed Systems over Unreliable and Hostile Networks](https://westminsterresearch.westminster.ac.uk/item/w7vvz/configuration-management-of-distributed-systems-over-unreliable-and-hostile-networks)
 
-- gdfg
-- dfg
+_täydentyy myöhemmin_
   
 ### a) Squid-proxyn manuaalinen asennus
 
