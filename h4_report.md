@@ -25,19 +25,19 @@ Esimerkki käytetystä komennosta: `curl -x localhost:3128 http://httpbin.org/ip
 
 <img width="1686" height="394" alt="Screenshot 2026-11-18 155241" src="https://github.com/user-attachments/assets/54f49a12-7865-45fc-8831-61072de2fed4" />
 
-Kuvassa alimpana näkyy välityspalvelimen lokitiedostoon (`/var/log/squid/access.log`) tallennettuja tietoja tehdyistä pyynnöistä. Onnistuneiden pyyntöjen perässä näkyy HTTP-tilakoodi 200 (OK), mikä todisti, että verkkoliikenne kulki halutulla tavalla välityspalvelimen kautta eikä suoraan internetiin. Listalla näkyvä 301-tilakoodilla (_Moved Permanently_) varustettu rivi johtui kokeilusta kohde-URL:llä `yle.fi`. Oletusarvoisesti `curl` ei seuraa uudelleenohjauksia, joten pyyntö pysähtyi tähän kyseiseen ohjausviestiin. Ohjausten seuraaminen automaattisesti edellyttäisi lisämäärettä `-L` eli komento olisi kokonaisuudessaan `curl -L  -x http://localhost:3128 yle.fi`.
+Kuvassa alimpana näkyy välityspalvelimen lokitiedostoon (`/var/log/squid/access.log`) tallennettuja tietoja tehdyistä pyynnöistä. Onnistuneiden pyyntöjen perässä näkyy HTTP-tilakoodi 200 (`OK`), mikä todisti, että verkkoliikenne kulki halutulla tavalla välityspalvelimen kautta eikä suoraan internetiin. Listalla näkyvä 301-tilakoodilla (_Moved Permanently_) varustettu rivi johtui kokeilusta kohde-URL:llä `yle.fi`. Oletusarvoisesti `curl` ei seuraa uudelleenohjauksia, joten pyyntö pysähtyi tähän kyseiseen ohjausviestiin. Ohjausten seuraaminen automaattisesti edellyttäisi lisämäärettä `-L` eli komento olisi kokonaisuudessaan `curl -L  -x http://localhost:3128 yle.fi`.
 
 Squidin konfiguraatiotiedosto sijaitsi hakemistossa `/etc/squid/squid.conf`. Vielä tässä vaiheessa siihen ei kajottu.
 
 ### b) Automatisoitu asennus Ansiblella
 
-Asennuksen automatisointia varten virtuaalikoneella luotiin Ansibleen uusi rooli `squid` ja siihen liittyvät muut hakemistot.
+Asennuksen automatisointia varten virtuaalikoneella luotiin Ansibleen uusi rooli `squid` ja siihen liittyvät hakemistot.
 
 <img width="260" height="190" alt="Screenshot 2026-11-18 163623" src="https://github.com/user-attachments/assets/e8781028-c2d8-4e59-845d-43ab1880c60e" />
 
-Ensimmäiseksi haettiin kohdepalvelimelta `squid`-daemonin manuaalisen asennuksen yhteydessä luotu oletuskonfiguraatiotiedosto omalle virtuaalikoneelle uudeln roolin `files`-kansioon komennolla `scp anssi@94.237.9.166:/etc/squid/squid.conf roles/squid/files/squid.conf`. 
+Ensimmäiseksi haettiin kohdepalvelimelta `squid`-daemonin manuaalisen asennuksen yhteydessä luotu oletuskonfiguraatiotiedosto omalle virtuaalikoneelle uuden roolin `files`-kansioon komennolla `scp testuser@94.237.9.166:/etc/squid/squid.conf roles/squid/files/squid.conf`. 
 
-`tasks`-kansion `main.yml`-tiedostossa määritettiin daemonin asennus sekä siirrettävän konfiguraatiotiedoston sijainti sekä paikallisesti että kohdepalvelimella. Tiedostolle asetettiin samalla asianmukaiset omistaja- ja käyttöoikeudet. Konfiguraatiotiedoston kopiointiin liitettiin myös `notify`-rivi, joka käynnistää tarvittaessa erillisen handlerin daemonin uudelleenkäynnistämiseksi. Lopun `service`-moduulilla varmistetaan, että palvelu on käynnissä ja kytketty päälle järjestelmän käynnistyessä.
+`tasks`-kansion `main.yml`-tiedostossa määritettiin daemonin asennus sekä hallinnoitavan konfiguraatiotiedoston sijainti sekä paikallisesti että kohdepalvelimella. Tiedostolle asetettiin samalla asianmukaiset omistaja- ja käyttöoikeudet. Konfiguraatiotiedoston kopiointiin liitettiin myös `notify`-rivi, mikä käynnistää tarvittaessa erillisen handlerin daemonin uudelleenkäynnistämiseksi. Lopun `service`-moduulilla varmistetaan, että palvelu on käynnissä ja kytketty päälle järjestelmän käynnistyessä.
 
 ```
 - apt:
@@ -68,9 +68,13 @@ Ensimmäiseksi haettiin kohdepalvelimelta `squid`-daemonin manuaalisen asennukse
     state: restarted
 ```
 
-Ansiblen `site.yml`-tiedostoon lisättiin uudeksi rooliksi `squid`.
+Vielä ennen Ansible-automaation ajamista kohdassa a) manuaalisesti asennettu daemon poistettiin puhtaalta pöydältä aloittamista varten komennolla `sudo apt purge squid`.
 
-Vielä ennen Ansible-automaation playbookin ajamista kohdassa a) manuaalisesti asennettu daemon poistettiin puhtaalta pöydältä aloittamista varten komennolla `sudo apt purge squid`.
+Ansiblen playbook-tiedostoon `site.yml` lisättiin suoritettavien roolien listaan kyseinen uusi rooli `squid`, minkä jälkeen ajettiin `ansible-playbook site.yml` ja varmistuttiin tulosteesta sekä palvelimen päässä, että asennus oli onnistunut.
+
+<img width="952" height="418" alt="Screenshot 2026-11-18 181758" src="https://github.com/user-attachments/assets/d90d7211-2add-4800-9d25-f915a7ef72ef" />
+
+<img width="1076" height="118" alt="Screenshot 2026-11-18 170405" src="https://github.com/user-attachments/assets/74ab5c3f-faad-40f9-885d-6eae7a1e1798" />
 
 ### c) 
 _päivittyy myöhemmin_
