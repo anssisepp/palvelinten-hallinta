@@ -4,7 +4,14 @@ Ympäristönä toimi Oraclen VirtualBoxiin asennettu Debian 13.7.0 -käyttöjär
 
 #### x) [Karvinen 2023: Configuration Management of Distributed Systems over Unreliable and Hostile Networks](https://westminsterresearch.westminster.ac.uk/item/w7vvz/configuration-management-of-distributed-systems-over-unreliable-and-hostile-networks)
 
-_täydentyy myöhemmin_
+- CM - configuration management
+- DSL - domain specific language (tiettyyn tarkoitukseen tehty kieli)
+- työkalujen funktioiden määrä ja dokumentaation laajuus ovat erittäin suuria
+  - esim. Salt >500, Puppet >100
+- pieni määrä funktioita kattaa suurimman osan käytössä olevista
+- muut komennot rakentuvat pohjimmiltaan `file` ja `exec` varaan
+- järjestelmän tulisi olla idempotentti (muutokset läpi vain tarvittaessa)
+- ensin suoritettu manuaalinen konfigurointi ohjaa vähempään kompleksisuuteen
   
 ### a) Squid-proxyn manuaalinen asennus
 
@@ -128,7 +135,7 @@ Asia korjaantui nopeasti normaaliksi ajamalla jälleen hallinnoivalla koneella `
 </table>
 
 
-### e) Idempontentti
+### e) Idempotentti
 
 Määritysten idempotenssi on helppo todeta ajamalla playbook-komento uudelleen. Tässä tapauksessa, koska järjestelmä oli jo valmiiksi halutussa tilassa eikä muutoksia tarvittu, Ansiblen suorituksen yhteenvedon `changed=0` osoittaa, että toistuvat ajot eivät aiheuta tarpeettomia muutoksia.
 
@@ -139,10 +146,12 @@ Määritysten idempotenssi on helppo todeta ajamalla playbook-komento uudelleen.
 
 DevCloudLab. SSH Tunneling Explained: -L, -R, and -D Port Forwarding. Luettavissa: https://devcloudlab.com/blog/ssh-tunneling-explained/. Luettu: 18.11.2026.
 
+Karvinen, Tero 2023. Configuration Management of Distributed Systems over Unreliable and Hostile Networks. Luettavissa: https://westminsterresearch.westminster.ac.uk/item/w7vvz/configuration-management-of-distributed-systems-over-unreliable-and-hostile-networks. Luettu: 18.11.2026.
+
 Karvinen, Tero 2026. Hello Ansible. Luettavissa: https://terokarvinen.com/hello-ansible/. Luettu: 17.11.2026. 
 
 Karvinen, Tero 2026. Palvelinten hallinta -kurssi. Luettavissa: https://terokarvinen.com/palvelinten-hallinta/. Luettu: 15.11.2026. 
 
-Red Hat Documentation. 16.4. Configuring a Domain Blacklist in Squid. Luettavissa: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/networking_guide/configuring-a-domain-blacklist-in-squid. Luettu 18.11.2026.
+Red Hat Documentation. 16.4. Configuring a Domain Blacklist in Squid. Luettavissa: https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/7/html/networking_guide/configuring-a-domain-blacklist-in-squid. Luettu: 18.11.2026.
 
-Ubuntu Server documentation. About Squid proxy servers. Luettavissa: https://ubuntu.com/server/docs/explanation/web-services/about-squid-proxy-servers/. Luettu 18.11.2026.
+Ubuntu Server documentation. About Squid proxy servers. Luettavissa: https://ubuntu.com/server/docs/explanation/web-services/about-squid-proxy-servers/. Luettu: 18.11.2026.
